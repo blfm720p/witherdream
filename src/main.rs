@@ -1,5 +1,5 @@
 use ggez::{event, ContextBuilder, GameResult};
-use ggez::graphics::{self, Canvas, Color, DrawParam, Image, Mesh, Rect, Text};
+use ggez::graphics::{self, Canvas, Color, DrawParam, Image, Mesh, Rect, Sampler, Text};
 use ggez::input::keyboard::KeyCode;
 use rand::{rng, Rng};
 use std::time::Instant;
@@ -94,6 +94,7 @@ impl Player {
 
     fn draw(&self, canvas: &mut Canvas, ctx: &mut ggez::Context, player_image: Option<&Image>) -> GameResult<()> {
         if let Some(img) = player_image {
+            canvas.set_sampler(Sampler::nearest_clamp());
             canvas.draw(img, DrawParam::default().dest([self.x, self.y]).scale([PLAYER_SIZE / img.width() as f32, PLAYER_SIZE / img.height() as f32]));
         } else {
             let rect = Rect::new(self.x, self.y, PLAYER_SIZE, PLAYER_SIZE);
@@ -423,9 +424,10 @@ impl event::EventHandler<ggez::GameError> for GameState {
 
                 // Draw bed
                 if let Some(ref bed_img) = self.bed_image {
-                    canvas.draw(bed_img, DrawParam::default().dest([self.bed_x, self.bed_y]).scale([1.0, 1.0]));
+                    canvas.set_sampler(Sampler::nearest_clamp());
+                    canvas.draw(bed_img, DrawParam::default().dest([self.bed_x, self.bed_y]).scale([2.0, 2.0]));
                 } else {
-                    let bed_rect = Rect::new(self.bed_x, self.bed_y, 60.0, 40.0);
+                    let bed_rect = Rect::new(self.bed_x, self.bed_y, 120.0, 80.0);
                     let bed_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), bed_rect, Color::from_rgb(139, 69, 19))?;
                     canvas.draw(&bed_mesh, DrawParam::default());
                 }
@@ -444,9 +446,10 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 // Draw bicycle if not collected
                 if !self.bicycle.collected {
                     if let Some(ref bike_img) = self.bicycle_image {
-                        canvas.draw(bike_img, DrawParam::default().dest([self.bicycle.x, self.bicycle.y]).scale([1.0, 1.0]));
+                        canvas.set_sampler(Sampler::nearest_clamp());
+                        canvas.draw(bike_img, DrawParam::default().dest([self.bicycle.x, self.bicycle.y]).scale([2.0, 2.0]));
                     } else {
-                        let bike_rect = Rect::new(self.bicycle.x, self.bicycle.y, 30.0, 20.0);
+                        let bike_rect = Rect::new(self.bicycle.x, self.bicycle.y, 60.0, 40.0);
                         let bike_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), bike_rect, Color::from_rgb(255, 0, 0))?;
                         canvas.draw(&bike_mesh, DrawParam::default());
                     }
@@ -455,9 +458,10 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 // Draw knife if not collected
                 if !self.knife.collected {
                     if let Some(ref knife_img) = self.knife_image {
-                        canvas.draw(knife_img, DrawParam::default().dest([self.knife.x, self.knife.y]).scale([1.0, 1.0]));
+                        canvas.set_sampler(Sampler::nearest_clamp());
+                        canvas.draw(knife_img, DrawParam::default().dest([self.knife.x, self.knife.y]).scale([2.0, 2.0]));
                     } else {
-                        let knife_rect = Rect::new(self.knife.x, self.knife.y, 40.0, 40.0);
+                        let knife_rect = Rect::new(self.knife.x, self.knife.y, 80.0, 80.0);
                         let knife_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), knife_rect, Color::from_rgb(128, 128, 128))?;
                         canvas.draw(&knife_mesh, DrawParam::default());
                     }
@@ -467,6 +471,7 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 for (i, npc) in self.npcs.iter().enumerate() {
                     let npc_image = if i == 0 { self.npc1_image.as_ref() } else { self.npc2_image.as_ref() };
                     if let Some(img) = npc_image {
+                        canvas.set_sampler(Sampler::nearest_clamp());
                         canvas.draw(img, DrawParam::default().dest([npc.x, npc.y]).scale([100.0 / img.width() as f32, 100.0 / img.height() as f32]));
                     } else {
                         let npc_rect = Rect::new(npc.x, npc.y, 100.0, 100.0);
