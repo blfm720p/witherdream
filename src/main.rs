@@ -130,6 +130,7 @@ struct GameState {
     transition_timer: f32,
     knife_image: Option<Image>,
     bicycle_image: Option<Image>,
+    bed_image: Option<Image>,
     title_start_time: Instant,
     _stream: OutputStream,
     sink: Sink,
@@ -160,6 +161,16 @@ impl GameState {
                 None
             }
         };
+        let bed_image = match Image::from_path(ctx, "/images/bed.png") {
+            Ok(img) => {
+                println!("Bed image loaded successfully");
+                Some(img)
+            }
+            Err(e) => {
+                println!("Failed to load bed image: {:?}", e);
+                None
+            }
+        };
 
         // Initialize audio
         ffmpeg::init().unwrap();
@@ -186,6 +197,7 @@ impl GameState {
             transition_timer: 0.0,
             knife_image,
             bicycle_image,
+            bed_image,
             title_start_time: Instant::now(),
             _stream,
             sink,
@@ -370,9 +382,13 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 self.player.draw(&mut canvas, ctx)?;
 
                 // Draw bed
-                let bed_rect = Rect::new(self.bed_x, self.bed_y, 60.0, 40.0);
-                let bed_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), bed_rect, Color::from_rgb(139, 69, 19))?;
-                canvas.draw(&bed_mesh, DrawParam::default());
+                if let Some(ref bed_img) = self.bed_image {
+                    canvas.draw(bed_img, DrawParam::default().dest([self.bed_x, self.bed_y]).scale([1.0, 1.0]));
+                } else {
+                    let bed_rect = Rect::new(self.bed_x, self.bed_y, 60.0, 40.0);
+                    let bed_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), bed_rect, Color::from_rgb(139, 69, 19))?;
+                    canvas.draw(&bed_mesh, DrawParam::default());
+                }
 
                 // Draw instructions
                 let text = Text::new("Press Z near bed to sleep");
