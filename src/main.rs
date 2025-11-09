@@ -92,10 +92,14 @@ impl Player {
         self.y = self.y.max(0.0).min(SCREEN_HEIGHT - PLAYER_SIZE);
     }
 
-    fn draw(&self, canvas: &mut Canvas, ctx: &mut ggez::Context) -> GameResult<()> {
-        let rect = Rect::new(self.x, self.y, PLAYER_SIZE, PLAYER_SIZE);
-        let mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), rect, Color::WHITE)?;
-        canvas.draw(&mesh, DrawParam::default());
+    fn draw(&self, canvas: &mut Canvas, ctx: &mut ggez::Context, player_image: Option<&Image>) -> GameResult<()> {
+        if let Some(img) = player_image {
+            canvas.draw(img, DrawParam::default().dest([self.x, self.y]).scale([PLAYER_SIZE / img.width() as f32, PLAYER_SIZE / img.height() as f32]));
+        } else {
+            let rect = Rect::new(self.x, self.y, PLAYER_SIZE, PLAYER_SIZE);
+            let mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), rect, Color::WHITE)?;
+            canvas.draw(&mesh, DrawParam::default());
+        }
         Ok(())
     }
 }
@@ -131,6 +135,9 @@ struct GameState {
     knife_image: Option<Image>,
     bicycle_image: Option<Image>,
     bed_image: Option<Image>,
+    player_image: Option<Image>,
+    npc1_image: Option<Image>,
+    npc2_image: Option<Image>,
     title_start_time: Instant,
     _stream: OutputStream,
     sink: Sink,
@@ -171,6 +178,36 @@ impl GameState {
                 None
             }
         };
+        let player_image = match Image::from_path(ctx, "/images/player.png") {
+            Ok(img) => {
+                println!("Player image loaded successfully");
+                Some(img)
+            }
+            Err(e) => {
+                println!("Failed to load player image: {:?}", e);
+                None
+            }
+        };
+        let npc1_image = match Image::from_path(ctx, "/images/npc1.png") {
+            Ok(img) => {
+                println!("NPC1 image loaded successfully");
+                Some(img)
+            }
+            Err(e) => {
+                println!("Failed to load NPC1 image: {:?}", e);
+                None
+            }
+        };
+        let npc2_image = match Image::from_path(ctx, "/images/npc2.png") {
+            Ok(img) => {
+                println!("NPC2 image loaded successfully");
+                Some(img)
+            }
+            Err(e) => {
+                println!("Failed to load NPC2 image: {:?}", e);
+                None
+            }
+        };
 
         // Initialize audio
         ffmpeg::init().unwrap();
@@ -198,6 +235,9 @@ impl GameState {
             knife_image,
             bicycle_image,
             bed_image,
+            player_image,
+            npc1_image,
+            npc2_image,
             title_start_time: Instant::now(),
             _stream,
             sink,
@@ -379,7 +419,7 @@ impl event::EventHandler<ggez::GameError> for GameState {
                     .color(Color::WHITE));
             }
             GameMode::Awake => {
-                self.player.draw(&mut canvas, ctx)?;
+                self.player.draw(&mut canvas, ctx, self.player_image.as_ref())?;
 
                 // Draw bed
                 if let Some(ref bed_img) = self.bed_image {
@@ -399,7 +439,7 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 canvas.draw(&text, DrawParam::default().dest([SCREEN_WIDTH / 2.0 - 150.0, SCREEN_HEIGHT / 2.0]));
             }
             GameMode::Dreaming => {
-                self.player.draw(&mut canvas, ctx)?;
+                self.player.draw(&mut canvas, ctx, self.player_image.as_ref())?;
 
                 // Draw bicycle if not collected
                 if !self.bicycle.collected {
@@ -424,10 +464,15 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 }
 
                 // Draw NPCs
-                for npc in &self.npcs {
-                    let npc_rect = Rect::new(npc.x, npc.y, 25.0, 25.0);
-                    let npc_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), npc_rect, Color::from_rgb(0, 255, 0))?;
-                    canvas.draw(&npc_mesh, DrawParam::default());
+                for (i, npc) in self.npcs.iter().enumerate() {
+                    let npc_image = if i == 0 { self.npc1_image.as_ref() } else { self.npc2_image.as_ref() };
+                    if let Some(img) = npc_image {
+                        canvas.draw(img, DrawParam::default().dest([npc.x, npc.y]).scale([25.0 / img.width() as f32, 25.0 / img.height() as f32]));
+                    } else {
+                        let npc_rect = Rect::new(npc.x, npc.y, 25.0, 25.0);
+                        let npc_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), npc_rect, Color::from_rgb(0, 255, 0))?;
+                        canvas.draw(&npc_mesh, DrawParam::default());
+                    }
                 }
 
                 // Draw world name
