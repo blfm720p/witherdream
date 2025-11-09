@@ -388,7 +388,7 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 // Draw bicycle if not collected
                 if !self.bicycle.collected {
                     if let Some(ref bike_img) = self.bicycle_image {
-                        canvas.draw(bike_img, DrawParam::default().dest([self.bicycle.x, self.bicycle.y]).scale([0.3, 0.3]));
+                        canvas.draw(bike_img, DrawParam::default().dest([self.bicycle.x, self.bicycle.y]).scale([1.0, 1.0]));
                     } else {
                         let bike_rect = Rect::new(self.bicycle.x, self.bicycle.y, 30.0, 20.0);
                         let bike_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), bike_rect, Color::from_rgb(255, 0, 0))?;
