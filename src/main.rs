@@ -459,9 +459,9 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 if !self.knife.collected {
                     if let Some(ref knife_img) = self.knife_image {
                         canvas.set_sampler(Sampler::nearest_clamp());
-                        canvas.draw(knife_img, DrawParam::default().dest([self.knife.x, self.knife.y]).scale([2.0, 2.0]));
+                        canvas.draw(knife_img, DrawParam::default().dest([self.knife.x, self.knife.y]).scale([1.0, 1.0]));
                     } else {
-                        let knife_rect = Rect::new(self.knife.x, self.knife.y, 80.0, 80.0);
+                        let knife_rect = Rect::new(self.knife.x, self.knife.y, 40.0, 40.0);
                         let knife_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), knife_rect, Color::from_rgb(128, 128, 128))?;
                         canvas.draw(&knife_mesh, DrawParam::default());
                     }
