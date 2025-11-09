@@ -8,7 +8,7 @@ use ffmpeg_next as ffmpeg;
 
 const SCREEN_WIDTH: f32 = 800.0;
 const SCREEN_HEIGHT: f32 = 600.0;
-const PLAYER_SIZE: f32 = 40.0;
+const PLAYER_SIZE: f32 = 80.0;
 const PLAYER_SPEED: f32 = 200.0;
 
 #[derive(Clone, Copy)]
@@ -467,9 +467,9 @@ impl event::EventHandler<ggez::GameError> for GameState {
                 for (i, npc) in self.npcs.iter().enumerate() {
                     let npc_image = if i == 0 { self.npc1_image.as_ref() } else { self.npc2_image.as_ref() };
                     if let Some(img) = npc_image {
-                        canvas.draw(img, DrawParam::default().dest([npc.x, npc.y]).scale([50.0 / img.width() as f32, 50.0 / img.height() as f32]));
+                        canvas.draw(img, DrawParam::default().dest([npc.x, npc.y]).scale([100.0 / img.width() as f32, 100.0 / img.height() as f32]));
                     } else {
-                        let npc_rect = Rect::new(npc.x, npc.y, 50.0, 50.0);
+                        let npc_rect = Rect::new(npc.x, npc.y, 100.0, 100.0);
                         let npc_mesh = Mesh::new_rectangle(ctx, graphics::DrawMode::fill(), npc_rect, Color::from_rgb(0, 255, 0))?;
                         canvas.draw(&npc_mesh, DrawParam::default());
                     }
