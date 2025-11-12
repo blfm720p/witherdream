@@ -1,4 +1,4 @@
-use crate::dialogue::Dialogue;
+use crate::dialogue::{Dialogue, Choice};
 use crate::dream_world::DreamWorld;
 use crate::inventory::Inventory;
 use crate::item::Item;
@@ -145,6 +145,12 @@ impl GameState {
         self.transition_timer = 0.0;
     }
 
+    pub fn go_to_sleep(&mut self) {
+        self.mode = GameMode::Sleeping;
+        self.current_world = Some(DreamWorld::random());
+        self.maze = Some(Maze::new());
+    }
+
     pub fn enter_dream(&mut self) {
         self.transition_state = TransitionState::FadingToDream;
         self.transition_alpha = 0.0;
@@ -246,7 +252,10 @@ impl event::EventHandler<ggez::GameError> for GameState {
                     let distance = (dx * dx + dy * dy).sqrt();
 
                     if distance < 50.0 && ctx.keyboard.is_key_just_pressed(self.settings.get_key("interact")) {
-                        self.dialogue = Some(Dialogue::new("The bed is so comfortable, I want to sleep here forever...".to_string(), "Bed".to_string()));
+                        self.dialogue = Some(Dialogue::new("The bed is so comfortable, I want to sleep here forever...".to_string(), "Bed".to_string()).with_choices(vec![
+                            Choice { text: "Lay down".to_string(), action: "lay_down".to_string() },
+                            Choice { text: "Cancel".to_string(), action: "cancel".to_string() },
+                        ]));
                     }
 
                     if ctx.keyboard.is_key_just_pressed(self.settings.get_key("inventory")) {
@@ -327,10 +336,26 @@ impl event::EventHandler<ggez::GameError> for GameState {
             }
         }
 
-        // Close dialogue
-        if let Some(ref mut _dialogue) = self.dialogue {
+        // Handle dialogue
+        if let Some(ref mut dialogue) = self.dialogue {
+            dialogue.update(ctx);
             if ctx.keyboard.is_key_just_pressed(KeyCode::Return) {
-                self.dialogue = None;
+                if let Some(action) = dialogue.select() {
+                    match action {
+                        "lay_down" => {
+                            self.go_to_sleep();
+                            self.dialogue = None;
+                        }
+                        "cancel" => {
+                            self.dialogue = None;
+                        }
+                        _ => {
+                            self.dialogue = None;
+                        }
+                    }
+                } else {
+                    self.dialogue = None;
+                }
             }
         }
 
@@ -551,7 +576,14 @@ fn load_video_frames(ctx: &mut ggez::Context, video_path: &str) -> Vec<Image> {
 fn load_image(ctx: &mut ggez::Context, path: &str) -> Option<Image> {
     match image::open(path) {
         Ok(img) => {
-            let rgba = img.to_rgba8();
+            let mut rgba = img.to_rgba8();
+            // Darken the image
+            for pixel in rgba.chunks_mut(4) {
+                pixel[0] = (pixel[0] as f32 * 0.7) as u8; // R
+                pixel[1] = (pixel[1] as f32 * 0.7) as u8; // G
+                pixel[2] = (pixel[2] as f32 * 0.7) as u8; // B
+                // A remains the same
+            }
             let width = rgba.width() as u32;
             let height = rgba.height() as u32;
             let data = rgba.into_raw();
