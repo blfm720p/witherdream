@@ -295,22 +295,9 @@ impl event::EventHandler<ggez::GameError> for GameState {
                     let old_y = self.player.y;
                     self.player.update(ctx, &self.settings, self.bicycle_speed_boost);
 
-                    // Maze collision - check all 4 corners
+                    // Maze collision - check center
                     if let Some(ref maze) = self.maze {
-                        let corners = [
-                            (self.player.x, self.player.y),
-                            (self.player.x + 80.0, self.player.y),
-                            (self.player.x, self.player.y + 80.0),
-                            (self.player.x + 80.0, self.player.y + 80.0),
-                        ];
-                        let mut hit_wall = false;
-                        for (cx, cy) in corners {
-                            if maze.is_wall(cx, cy) {
-                                hit_wall = true;
-                                break;
-                            }
-                        }
-                        if hit_wall {
+                        if maze.is_wall(self.player.x + 40.0, self.player.y + 40.0) {
                             self.player.x = old_x;
                             self.player.y = old_y;
                         }
