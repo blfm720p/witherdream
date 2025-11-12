@@ -149,6 +149,25 @@ impl GameState {
         self.mode = GameMode::Sleeping;
         self.current_world = Some(DreamWorld::random());
         self.maze = Some(Maze::new());
+
+        // Set player to maze start
+        self.player.x = 40.0;
+        self.player.y = 40.0;
+
+        // Randomize NPC positions
+        if let Some(ref maze) = self.maze {
+            for npc in &mut self.npcs {
+                loop {
+                    let x = rng().random_range(0..20) as f32 * 40.0;
+                    let y = rng().random_range(0..15) as f32 * 40.0;
+                    if !maze.is_wall(x, y) {
+                        npc.x = x;
+                        npc.y = y;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     pub fn enter_dream(&mut self) {
@@ -276,9 +295,22 @@ impl event::EventHandler<ggez::GameError> for GameState {
                     let old_y = self.player.y;
                     self.player.update(ctx, &self.settings, self.bicycle_speed_boost);
 
-                    // Maze collision
+                    // Maze collision - check all 4 corners
                     if let Some(ref maze) = self.maze {
-                        if maze.is_wall(self.player.x + 40.0, self.player.y + 40.0) {
+                        let corners = [
+                            (self.player.x, self.player.y),
+                            (self.player.x + 80.0, self.player.y),
+                            (self.player.x, self.player.y + 80.0),
+                            (self.player.x + 80.0, self.player.y + 80.0),
+                        ];
+                        let mut hit_wall = false;
+                        for (cx, cy) in corners {
+                            if maze.is_wall(cx, cy) {
+                                hit_wall = true;
+                                break;
+                            }
+                        }
+                        if hit_wall {
                             self.player.x = old_x;
                             self.player.y = old_y;
                         }
@@ -449,16 +481,22 @@ impl event::EventHandler<ggez::GameError> for GameState {
                     }
                 }
 
-                // Draw NPCs
+                // Draw NPCs within vision radius
+                let vision_radius = 200.0;
                 for (i, npc) in self.npcs.iter().enumerate() {
-                    let npc_image = if i == 0 { self.npc1_image.as_ref() } else { self.npc2_image.as_ref() };
-                    if let Some(img) = npc_image {
-                        canvas.set_sampler(Sampler::nearest_clamp());
-                        canvas.draw(img, DrawParam::default().dest([npc.x, npc.y]).scale([100.0 / img.width() as f32, 100.0 / img.height() as f32]));
-                    } else {
-                        let npc_rect = Rect::new(npc.x, npc.y, 100.0, 100.0);
-                        let npc_mesh = Mesh::new_rectangle(ctx, ggez::graphics::DrawMode::fill(), npc_rect, Color::GREEN)?;
-                        canvas.draw(&npc_mesh, DrawParam::default());
+                    let dx = npc.x - self.player.x;
+                    let dy = npc.y - self.player.y;
+                    let distance = (dx * dx + dy * dy).sqrt();
+                    if distance <= vision_radius {
+                        let npc_image = if i == 0 { self.npc1_image.as_ref() } else { self.npc2_image.as_ref() };
+                        if let Some(img) = npc_image {
+                            canvas.set_sampler(Sampler::nearest_clamp());
+                            canvas.draw(img, DrawParam::default().dest([npc.x, npc.y]).scale([100.0 / img.width() as f32, 100.0 / img.height() as f32]));
+                        } else {
+                            let npc_rect = Rect::new(npc.x, npc.y, 100.0, 100.0);
+                            let npc_mesh = Mesh::new_rectangle(ctx, ggez::graphics::DrawMode::fill(), npc_rect, Color::GREEN)?;
+                            canvas.draw(&npc_mesh, DrawParam::default());
+                        }
                     }
                 }
 
