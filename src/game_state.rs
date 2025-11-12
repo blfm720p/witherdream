@@ -278,7 +278,7 @@ impl event::EventHandler<ggez::GameError> for GameState {
 
                     // Maze collision
                     if let Some(ref maze) = self.maze {
-                        if maze.is_wall(self.player.x, self.player.y) {
+                        if maze.is_wall(self.player.x + 40.0, self.player.y + 40.0) {
                             self.player.x = old_x;
                             self.player.y = old_y;
                         }
