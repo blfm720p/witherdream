@@ -508,6 +508,12 @@ impl event::EventHandler<ggez::GameError> for GameState {
                     canvas.draw(&particle_mesh, DrawParam::default());
                 }
 
+                // Draw fog effect
+                let fog_color = Color::from_rgba(0, 0, 0, 120);
+                let fog_rect = Rect::new(0.0, 0.0, SCREEN_WIDTH, SCREEN_HEIGHT);
+                let fog_mesh = Mesh::new_rectangle(ctx, ggez::graphics::DrawMode::fill(), fog_rect, fog_color)?;
+                canvas.draw(&fog_mesh, DrawParam::default());
+
                 // Draw world name
                 if let Some(world) = self.current_world {
                     let text = Text::new(format!("Dreaming in: {}", world.name));
