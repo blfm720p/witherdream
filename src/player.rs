@@ -2,7 +2,7 @@ use crate::settings::Settings;
 use ggez::graphics::{Canvas, Color, DrawParam, Image, Mesh, Rect, Sampler};
 
 const PLAYER_SIZE: f32 = 80.0;
-const PLAYER_SPEED: f32 = 200.0;
+const PLAYER_SPEED: f32 = 150.0;
 
 pub struct Player {
     pub x: f32,
@@ -19,7 +19,7 @@ impl Player {
 
     pub fn update(&mut self, ctx: &mut ggez::Context, settings: &Settings, speed_boost: bool) {
         let dt = ctx.time.delta().as_secs_f32();
-        let speed = if speed_boost { PLAYER_SPEED * 2.0 } else { PLAYER_SPEED };
+        let speed = if speed_boost { PLAYER_SPEED * 1.5 } else { PLAYER_SPEED };
 
         if ctx.keyboard.is_key_pressed(settings.get_key("up")) {
             self.y -= speed * dt;

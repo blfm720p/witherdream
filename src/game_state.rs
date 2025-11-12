@@ -272,14 +272,15 @@ impl event::EventHandler<ggez::GameError> for GameState {
             }
             GameMode::Dreaming => {
                 if self.transition_state == TransitionState::None {
+                    let old_x = self.player.x;
+                    let old_y = self.player.y;
                     self.player.update(ctx, &self.settings, self.bicycle_speed_boost);
 
                     // Maze collision
                     if let Some(ref maze) = self.maze {
-                        // Adjust player position if hitting wall
                         if maze.is_wall(self.player.x, self.player.y) {
-                            self.player.x -= self.player.x % 40.0;
-                            self.player.y -= self.player.y % 40.0;
+                            self.player.x = old_x;
+                            self.player.y = old_y;
                         }
                     }
 
