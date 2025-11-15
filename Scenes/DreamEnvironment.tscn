@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://c2d3e4f5g6h7i8j9"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(2000, 100)
+
+[node name="DreamEnvironment" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.2, 0.1, 0.3, 1)
+
+
+[node name="FloatingPlatform1" type="StaticBody2D" parent="."]
+position = Vector2(500, 700)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatingPlatform1"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ColorRect" type="ColorRect" parent="FloatingPlatform1"]
+offset_left = -100.0
+offset_top = -25.0
+offset_right = 100.0
+offset_bottom = 25.0
+color = Color(0.6, 0.3, 0.7, 1)
+
+[node name="FloatingPlatform2" type="StaticBody2D" parent="."]
+position = Vector2(800, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloatingPlatform2"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ColorRect" type="ColorRect" parent="FloatingPlatform2"]
+offset_left = -100.0
+offset_top = -25.0
+offset_right = 100.0
+offset_bottom = 25.0
+color = Color(0.6, 0.3, 0.7, 1)
+
+[node name="Collectible1" type="Area2D" parent="."]
+position = Vector2(600, 650)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collectible1"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ColorRect" type="ColorRect" parent="Collectible1"]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(1, 1, 0, 1)
+
+[node name="Collectible2" type="Area2D" parent="."]
+position = Vector2(900, 450)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Collectible2"]
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ColorRect" type="ColorRect" parent="Collectible2"]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+color = Color(1, 1, 0, 1)

@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://df2m5kj5sapcf"]
+
+[ext_resource type="Script" uid="uid://chx3ye2vibqp6" path="res://Scripts/Player.gd" id="1_abc123"]
+[ext_resource type="Script" uid="uid://c61bco4tollvl" path="res://Scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://lresojblyp2w" path="res://Scenes/DreamEnvironment.tscn" id="2_def456"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kln2b"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_abc123"]
+size = Vector2(72, 92)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="DreamEnvironment" parent="." instance=ExtResource("2_def456")]
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(100, 300)
+script = ExtResource("1_abc123")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player"]
+sprite_frames = SubResource("SpriteFrames_kln2b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_abc123")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+
+[node name="UI" type="CanvasLayer" parent="."]
